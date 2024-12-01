@@ -4,4 +4,4 @@ https://adventofcode.com/
 
 Everything here done for fun, no guarantees any or all of the tasks will get solved.
 
-I will be working in C# / .NET 8.
+I will be working in C# / .NET 9.
