@@ -1,5 +1,7 @@
+#! /usr/local/bin/pwsh
 if ( $args.Length -lt 1) {
     Write-Error "Supply a name for your new project"
+    return
 }
 $dir = $args[0]
 
