@@ -1,8 +1,8 @@
-﻿// Normally we will start by reading lines from an input file
-var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
+﻿var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
 var records = input.Select(line => line.Split(' ').Select(x => x.ToInt()).ToArray());
 
-bool IsSsafe(int[] record)
+bool IsSafe(int[] record) => IsSafeRecur(record, record, 0);
+bool IsSafeRecur(int[] record, int[] orgRecord, int recurPos)
 {
     bool descending = record[1] - record[0] < 0;
     if (descending)
@@ -12,17 +12,19 @@ bool IsSsafe(int[] record)
     foreach (int n in record.Skip(1))
     {
         if (n < i || n - i < 1 || n - i > 3)
+        {
+            if (recurPos < orgRecord.Length)
+            {
+                var retryRecord = orgRecord[..recurPos].Concat(orgRecord[(recurPos+1)..]).ToArray();
+                return IsSafeRecur(retryRecord, orgRecord, recurPos + 1);
+            }
             return false;
+        }
         i = n;
     }
 
     return true;
 }
 
-int count = records.Count(IsSsafe);
-if (count < 10)
-{
-    var safeRecords = records.Select(x => new { Safe = IsSsafe(x), Record = String.Join(" ",x) });
-    safeRecords.DumpConsole();
-}
+int count = records.Count(IsSafe);
 WriteLine(count);
