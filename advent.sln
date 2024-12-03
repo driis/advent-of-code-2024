@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "template", "template\templa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "day2", "day2\day2.csproj", "{D3362916-61C1-4D19-AF4B-E9FAF5152125}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "day3", "day3\day3.csproj", "{5896ABFF-1B96-4AC4-A067-51ABC31E1913}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{D3362916-61C1-4D19-AF4B-E9FAF5152125}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3362916-61C1-4D19-AF4B-E9FAF5152125}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3362916-61C1-4D19-AF4B-E9FAF5152125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5896ABFF-1B96-4AC4-A067-51ABC31E1913}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5896ABFF-1B96-4AC4-A067-51ABC31E1913}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5896ABFF-1B96-4AC4-A067-51ABC31E1913}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5896ABFF-1B96-4AC4-A067-51ABC31E1913}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
