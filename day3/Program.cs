@@ -5,13 +5,12 @@ Regex regMultiply = new Regex("mul\\((\\d+),(\\d+)\\)");
 int Multiplies(string data)
 {
     var mulInstructions = regMultiply.Matches(data);
-    var result = mulInstructions.Select(m =>
+    return mulInstructions.Select(m =>
     {
         var x = m.Groups[1].Value.ToInt();
         var y = m.Groups[2].Value.ToInt();
         return x * y;
     }).Sum();
-    return result;
 }
 
 // Part 1
@@ -19,17 +18,17 @@ WriteLine(Multiplies(input));
 
 // Part 2
 string data = String.Join("", input);
-int cursor = 0;
-bool doDont = true;
+int cursor;
+bool valid = true;
 string result = "";
 string Word(bool state) => state ? "don't()" : "do";
-while (-1 != (cursor = data.IndexOf(Word(doDont), StringComparison.Ordinal)))
+while (-1 != (cursor = data.IndexOf(Word(valid), StringComparison.Ordinal)))
 {
-    if (doDont)
+    if (valid)
     {
         result += data[..cursor];
     }
     data = data[..(cursor+2)];
-    doDont = !doDont;
+    valid = !valid;
 }
 WriteLine(Multiplies(result));
