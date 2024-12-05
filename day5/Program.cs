@@ -1,22 +1,22 @@
 ﻿// Normally we will start by reading lines from an input file
 
-using System.Collections;
-
 var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
 var rules = input.TakeWhile(x => x != "").Select(x =>
 {
     var p = x.Split('|').Select(n => n.ToInt()).ToArray();
     return new Rule(p[0], p[1]);
-});
+}).ToArray();
 var updates = input.SkipWhile(x => x != "").Where(x => !String.IsNullOrEmpty(x)).Select(x =>
-    new Update(x.Split(',').Select(x => x.ToInt()).ToArray()));
+    new Update(x.Split(',').Select(x => x.ToInt()).ToArray())).ToArray();
 
+// Part 1
 var validUpdates = updates.Where(x => rules.All(r => r.CheckUpdate(x)));
 var answer = validUpdates.Sum(u => u.Middle);
 WriteLine(answer);
 
+// Part 2
 var invalid = updates.Where(x => !rules.All(r => r.CheckUpdate(x)));
-var answerPart2 = invalid.Select(x => x.AccordingToRules(rules.ToArray())).Sum(x => x.Middle);
+var answerPart2 = invalid.Select(x => x.AccordingToRules(rules)).Sum(x => x.Middle);
 WriteLine(answerPart2);
 
 record Rule(int First, int Second)
@@ -27,7 +27,7 @@ record Rule(int First, int Second)
         int z = update.IndexOfPage(Second);
         return n < z || z == -1;
     }
-};
+}
 
 record Update(int[] Pages)
 {
