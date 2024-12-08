@@ -45,10 +45,10 @@ foreach (var frequency in frequencies)
             while(antinode is { Y: >= 0, X: >= 0 } && antinode.Y < h && antinode.X < w)
             {
                 antinodes.Add(antinode);
-                antinodes.Add(op);
-                antinodes.Add(p);
                 antinode = new Point(antinode.X - dx, antinode.Y - dy);
             }
+
+            antinodes.Add(op);
         }
     }
 }
