@@ -1,8 +1,4 @@
-﻿// Normally we will start by reading lines from an input file
-
-using System.Runtime.CompilerServices;
-
-var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
+﻿var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
 
 var equations = input.Select(Record.Parse).ToArray();
 var matches = equations.Where(e => e.HasMatch());
@@ -54,11 +50,12 @@ record Op(char What)
                 option.Concat([new ('|')]).ToArray())));
             foreach (var op in built)
                 yield return op;
-            yield break;
         }
-
-        yield return [new('*')];
-        yield return [new('+')];
-        yield return [new('|')];
+        else
+        {
+            yield return [new('*')];
+            yield return [new('+')];
+            yield return [new('|')];    
+        }
     }
 }
