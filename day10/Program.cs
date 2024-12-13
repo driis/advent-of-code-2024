@@ -1,43 +1,39 @@
-﻿// Normally we will start by reading lines from an input file
+﻿var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
 
-using System.Runtime.Intrinsics.X86;
-
-var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
-
-
-// Part 1 
 Map map = new (input);
-List<int> trailHeads = new();
-int score = 0;
-for (int y = 0; y < input.Length; y++)
+Dictionary<Point, IEnumerable<Point[]>> paths = new();
+var trailHeads = map.AllPoints.Where(p => map[p] == 0);
+foreach (var pos in trailHeads)
 {
-    var line = input[y];
-    for (int x = 0; x < line.Length; x++)
-    {
-        if (line[x] == '0')
-        {
-            // Possible trail head
-            trailHeads.Add(map.ScoreForTrail(new(x, y)));
-        }
-    }
+    paths.Add(pos, map.PathsFrom([pos]).ToArray());
 }
-trailHeads.DumpConsole();
-score = trailHeads.Sum();
+
+// Part 1
+var score = paths.Select(kp => kp.Value.Select(path => path.Last()).Distinct().Count()).Sum();
 WriteLine(score);
+// Part 2 
+var distinct = paths.SelectMany(kp => kp.Value)
+    .Select(path => String.Join(" | ", path.Select(kp => $"{kp.X},{kp.Y}"))).Distinct();
+WriteLine(distinct.Count());
 
 public class Map(string[] data)
 {
     private bool WithinBounds(Point p) => p.Y >= 0 && p.X >= 0 && p.Y < data.Length && p.X < data[0].Length;
 
-    public int ScoreForTrail(Point pos)
+    public IEnumerable<Point> AllPoints => data.SelectMany((line,y) => line.Select((_,x)=> new Point(x,y)));
+    public IEnumerable<Point[]> PathsFrom(Point[] soFar)
     {
-        if (this[pos] == 9)
+        if (this[soFar.Last()] == 9)
+            yield return soFar;
+        
+        var validMoves = ValidMovesFrom(soFar.Last());
+        foreach (var m in validMoves)
         {
-            return 1;
+            foreach (var path in PathsFrom(soFar.Concat([m]).ToArray()))
+            {
+                yield return path;
+            }
         }
-
-        var moves = ValidMovesFrom(pos);
-        return moves.Sum(ScoreForTrail);
     }
 
     private IEnumerable<Point> ValidMovesFrom(Point pos)
@@ -52,7 +48,7 @@ public class Map(string[] data)
         return moves.Where(m => WithinBounds(m) && this[m] == target);
     }
 
-    private int this[Point p] => data[p.Y][p.X] - '0';
+    public int this[Point p] => data[p.Y][p.X] - '0';
 }
 
 public record Point(int X, int Y);

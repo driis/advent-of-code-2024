@@ -25,11 +25,14 @@ public static class Extensions
             throw new ApplicationException($"{value} could not be parsed as a long");
     }
 
-    public static void DumpConsole<T>(this IEnumerable<T> items)
+    public static IEnumerable<T> DumpConsole<T>(this IEnumerable<T> items)
     {
-        foreach (var item in items)
+        var arr = items.ToArray();
+        foreach (var item in arr)
         {
             WriteLine(item);
         }
+
+        return arr;
     }
 }
