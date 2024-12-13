@@ -1,32 +1,25 @@
 ﻿var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
-
 Map map = new (input);
-Dictionary<Point, IEnumerable<Point[]>> paths = new();
-var trailHeads = map.AllPoints.Where(p => map[p] == 0);
-foreach (var pos in trailHeads)
-{
-    paths.Add(pos, map.PathsFrom([pos]).ToArray());
-}
+var trailHeads = map.AllPoints.Where(map.IsTrailHead);
+var trails = trailHeads.Select(pos => map.PathsFrom([pos]).ToArray()).ToArray();
 
 // Part 1
-var score = paths.Select(kp => kp.Value.Select(path => path.Last()).Distinct().Count()).Sum();
+var score = trails.Select(trail => trail.Select(path => path.Last()).Distinct().Count()).Sum();
 WriteLine(score);
 // Part 2 
-var distinct = paths.SelectMany(kp => kp.Value)
-    .Select(path => String.Join(" | ", path.Select(kp => $"{kp.X},{kp.Y}"))).Distinct();
+var distinct = trails.SelectMany(x => x).Select(path => String.Join(" | ", path.Select(kp => $"{kp.X},{kp.Y}"))).Distinct();
 WriteLine(distinct.Count());
 
 public class Map(string[] data)
 {
-    private bool WithinBounds(Point p) => p.Y >= 0 && p.X >= 0 && p.Y < data.Length && p.X < data[0].Length;
-
     public IEnumerable<Point> AllPoints => data.SelectMany((line,y) => line.Select((_,x)=> new Point(x,y)));
     public IEnumerable<Point[]> PathsFrom(Point[] soFar)
     {
-        if (this[soFar.Last()] == 9)
+        var loc = soFar.Last();
+        if (this[loc] == 9)
             yield return soFar;
         
-        var validMoves = ValidMovesFrom(soFar.Last());
+        var validMoves = ValidMovesFrom(loc);
         foreach (var m in validMoves)
         {
             foreach (var path in PathsFrom(soFar.Concat([m]).ToArray()))
@@ -35,6 +28,8 @@ public class Map(string[] data)
             }
         }
     }
+
+    public bool IsTrailHead(Point p) => this[p] == 0;
 
     private IEnumerable<Point> ValidMovesFrom(Point pos)
     {
@@ -48,7 +43,8 @@ public class Map(string[] data)
         return moves.Where(m => WithinBounds(m) && this[m] == target);
     }
 
-    public int this[Point p] => data[p.Y][p.X] - '0';
+    private int this[Point p] => data[p.Y][p.X] - '0';
+    private bool WithinBounds(Point p) => p.Y >= 0 && p.X >= 0 && p.Y < data.Length && p.X < data[0].Length;
 }
 
 public record Point(int X, int Y);
