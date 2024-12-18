@@ -4,64 +4,63 @@ using System.Xml.Linq;
 
 var input = File.ReadAllLines(args.FirstOrDefault() ?? "input.txt");
 var machines = input.Select((line, idx) => new { line, idx }).GroupBy(n => n.idx / 4)
-    .Select(g => Machine.Parse(g.Select(line => line.line).ToArray()));
+    .Select(g => Machine.Parse(g.Select(line => line.line).ToArray())).ToArray();
 
-var solutions = machines.SelectMany(m => m.Solutions().OrderBy(s => s.Cost).Take(1));
-int totalCost = solutions.Sum(x => x.Cost);
-WriteLine($"Part 1: {totalCost}");
+long SolveCostFor(IReadOnlyList<Machine> machines)
+{
+    var solutions = machines.SelectMany(m => m.Solutions().OrderBy(s => s.Cost).Take(1));
+    long totalCost = solutions.Sum(x => x.Cost);
+    return totalCost;
+}
+
+long costPartOne = SolveCostFor(machines);
+WriteLine($"Part 1: {costPartOne}");
+
+var machinesPartTwo = machines.Select(machine => new Machine(machine.A, machine.B, new Target(machine.Target.X + 10000000000000L, machine.Target.Y + 10000000000000L))).ToArray();
+long totalCostPartTwo = SolveCostFor(machinesPartTwo);
+WriteLine($"Part 2: {totalCostPartTwo}");
 
 record Button(int dX, int dY)
 {
-    private static Regex parseEx = new Regex("Button \\w: X\\+(\\d+), Y\\+(\\d+)");
+    private static readonly Regex ParseEx = new("Button \\w: X\\+(\\d+), Y\\+(\\d+)");
     public static Button Parse(string input)
     {
-        var match = parseEx.Match(input);
+        var match = ParseEx.Match(input);
         if (!match.Success)
             throw new ApplicationException($"Unexpected input {input}");
         return new Button(match.Groups[1].Value.ToInt(), match.Groups[2].Value.ToInt());
     }
 }
 
-record Target(int X, int Y)
+record Target(long X, long Y)
 {
-    private static Regex parseEx = new Regex("Prize: X\\=(\\d+), Y\\=(\\d+)");
+    private static readonly Regex ParseEx = new("Prize: X\\=(\\d+), Y\\=(\\d+)");
     public static Target Parse(string input)
     {
-        var match = parseEx.Match(input);
+        var match = ParseEx.Match(input);
         if (!match.Success)
             throw new ApplicationException($"Unexpected input {input}");
-        return new Target(match.Groups[1].Value.ToInt(), match.Groups[2].Value.ToInt());
+        return new Target(match.Groups[1].Value.ToLong(), match.Groups[2].Value.ToLong());
     }
 }
 
-public record Solution(int Apresses, int Bpresses)
+public record Solution(long Apresses, long Bpresses)
 {
-    public int Cost => Apresses * 3 + Bpresses;
-};
+    public long Cost => Apresses * 3 + Bpresses;
+}
 
-class Machine(Button A, Button B, Target target)
+record Machine(Button A, Button B, Target Target)
 {
     public IEnumerable<Solution> Solutions()
     {
-        int aMax = Math.Max(target.X / A.dX, target.Y / A.dY);
-        if (aMax > 100) aMax = 100;
-
-        for (int a = aMax; a >= 0; a--)
-        {
-            // For this A, which B press solutions exists ? 
-            int x = a * A.dX;
-            int y = a * A.dY;
-            int rx = target.X - x;
-            int ry = target.Y - y;
-            if (rx % B.dX == 0 && ry % B.dY == 0)
-            {
-                int b = rx / B.dX;
-                if (ry / B.dY == b)
-                {
-                    yield return new Solution(a, b);
-                }
-            }
-        }
+        // Cramer's rule
+        var determinant = (A.dX * B.dY - B.dX * A.dY);
+        if (determinant == 0)
+            yield break;
+        long ap = (Target.X * B.dY - B.dX * Target.Y) / determinant;
+        long bp = (A.dX * Target.Y - Target.X * A.dY) / determinant;
+        if (ap * A.dX + bp * B.dX == Target.X && ap * A.dY + bp * B.dY == Target.Y)
+            yield return new Solution(ap,bp);
     }
     
     public static Machine Parse(string[] input)
