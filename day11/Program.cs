@@ -4,8 +4,6 @@ string line = input.Single();
 
 var numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToLong()).ToArray();
 
-long[] ApplyRules(long[] state) => state.SelectMany(ApplyRulesToElement).ToArray();
-
 long[] ApplyRulesToElement(long element)
 {
     if (element == 0)
@@ -20,18 +18,21 @@ long[] ApplyRulesToElement(long element)
     return [element * 2024];
 }
 
-const int blinks = 25;
-long sum = 0;
-foreach (var number in numbers)
+int CountExpandedElements(long element, int iterations)
 {
-    long[] temp = [number];
-    for (int n = 0; n < blinks; n++)
-    {
-        temp = ApplyRules(temp);
-    }
-
-    WriteLine($"{number} expanded to {temp.Length} stones.");
-    sum += temp.Length;
+    if (iterations == 0)
+        return 1;
+    
+    var result = ApplyRulesToElement(element);
+    return result.Sum(e => CountExpandedElements(e, iterations - 1));
 }
 
+// Part 1
+var answerPartOne = numbers.Sum(n => CountExpandedElements(n, 25));
+WriteLine(answerPartOne);
+
+// Part 2
+const int blinks = 75;
+long sum = 0;
+Parallel.ForEach(numbers, n => sum += CountExpandedElements(n, blinks));
 WriteLine(sum);
